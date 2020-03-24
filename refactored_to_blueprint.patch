@@ -1,0 +1,105 @@
+Index: src/app.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/app.py	(revision 2b4119c601eae89bbe11e949e9e6c9829ba7e97e)
++++ src/app.py	(date 1585047809278)
+@@ -1,7 +1,6 @@
+-from flask import Flask, Response, request
++from flask import Flask
++from src.resources.movie import movies
+ 
+-
+-from src.database.models import Movie
+ from src.database.db import initialize_db
+ 
+ app = Flask(__name__)
+@@ -11,39 +10,7 @@
+ }
+ 
+ db = initialize_db(app)
+-
+-
+-@app.route('/movies')
+-def get_movies():
+-    movies = Movie.objects.to_json()
+-    return Response(movies, mimetype='application/json', status=200)
+-
+-
+-@app.route('/movies', methods=['POST'])
+-def add_movie():
+-    body = request.get_json()
+-    movie = Movie(**body).save()
+-    id = movie.id
+-    return {'id': str(id)}, 200
+-
+-
+-@app.route('/movies/<id>', methods=['PUT'])
+-def update_movie(id):
+-    body = request.get_json()
+-    Movie.objects.get(id=id).update(**body)
+-    return '', 200
+-
+-
+-@app.route('/movies/<id>', methods=['DELETE'])
+-def delete_movie(id):
+-    Movie.objects.get(id=id).delete()
+-    return '', 200
+-
+-
+-@app.route('/movies/<id>', methods=['GET'])
+-def get_movie(id):
+-    movies = Movie.objects.get(id=id).to_json()
+-    return Response(movies, mimetype='application/json', status=200)
++app.register_blueprint(movies)
+ 
+ 
+ app.run()
+\ No newline at end of file
+Index: src/resources/movie.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/resources/movie.py	(date 1585047809261)
++++ src/resources/movie.py	(date 1585047809261)
+@@ -0,0 +1,38 @@
++from flask import Blueprint, Response, request
++
++from src.database.models import Movie
++
++movies = Blueprint('movies', __name__)
++
++
++@movies.route('/movies')
++def get_movies():
++    movies = Movie.objects.to_json()
++    return Response(movies, mimetype='application/json', status=200)
++
++
++@movies.route('/movies', methods=['POST'])
++def add_movie():
++    body = request.get_json()
++    movie = Movie(**body).save()
++    id = movie.id
++    return {'id': str(id)}, 200
++
++
++@movies.route('/movies/<id>', methods=['PUT'])
++def update_movie(id):
++    body = request.get_json()
++    Movie.objects.get(id=id).update(**body)
++    return '', 200
++
++
++@movies.route('/movies/<id>', methods=['DELETE'])
++def delete_movie(id):
++    Movie.objects.get(id=id).delete()
++    return '', 200
++
++
++@movies.route('/movies/<id>', methods=['GET'])
++def get_movie(id):
++    movies = Movie.objects.get(id=id).to_json()
++    return Response(movies, mimetype='application/json', status=200)
