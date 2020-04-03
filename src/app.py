@@ -4,10 +4,11 @@ from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
 from src.database.db import initialize_db
+from src.resources.errors import errors
 from src.resources.routes import initialize_routes
 
 APP = Flask(__name__)
-API = Api(APP)
+API = Api(APP, errors=errors)
 BCRYPT = Bcrypt(APP)
 JWT = JWTManager(APP)
 
